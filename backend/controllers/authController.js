@@ -65,23 +65,32 @@ const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    console.log(`Login attempt for email: ${email}`);
+
     // Check if user exists
     const user = await User.findOne({ email }).populate('profile');
     if (!user) {
+      console.log(`User not found for email: ${email}`);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
+
+    console.log(`User found: ${user.email}, Role: ${user.role}`);
 
     // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
+      console.log(`Password mismatch for email: ${email}`);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
+
+    console.log(`Login successful for email: ${email}`);
 
     // Generate JWT token
     const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     res.status(200).json({ token, user: { id: user._id, email, role: user.role, profile: user.profile } });
   } catch (error) {
+    console.error(`Login error for email: ${email}`, error);
     res.status(500).json({ message: error.message });
   }
 };
