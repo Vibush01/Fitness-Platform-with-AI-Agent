@@ -3,6 +3,8 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/auth');
+const gymRoutes = require('./routes/gym');
+const userRoutes = require('./routes/user');
 
 dotenv.config();
 
@@ -16,6 +18,8 @@ connectDB();
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/gym', gymRoutes);
+app.use('/api/user', userRoutes);
 
 app.get('/', (req, res) => {
   res.send('BeFit Backend is running');
