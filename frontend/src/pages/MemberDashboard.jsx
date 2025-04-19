@@ -27,14 +27,20 @@ const MemberDashboard = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         const today = new Date().toISOString().split('T')[0];
-        const todayMacros = macroRes.data.filter(log => new Date(log.loggedAt).toISOString().split('T')[0] === today);
+        const todayMacros = macroRes.data.filter(log => {
+          const logDate = new Date(log.loggedAt).toISOString().split('T')[0];
+          return logDate === today;
+        });
         setMacroLogs(todayMacros);
 
         // Fetch today's body progress
         const progressRes = await axios.get('http://localhost:5000/api/body-progress/logs', {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const todayProgress = progressRes.data.filter(log => new Date(log.loggedAt).toISOString().split('T')[0] === today);
+        const todayProgress = progressRes.data.filter(log => {
+          const logDate = new Date(log.loggedAt).toISOString().split('T')[0];
+          return logDate === today;
+        });
         setBodyProgress(todayProgress);
       } catch (error) {
         console.error('Error fetching data:', error);
