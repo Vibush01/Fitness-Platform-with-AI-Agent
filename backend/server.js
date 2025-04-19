@@ -5,6 +5,9 @@ const connectDB = require('./config/db');
 const authRoutes = require('./routes/auth');
 const gymRoutes = require('./routes/gym');
 const userRoutes = require('./routes/user');
+const macroRoutes = require('./routes/macro');
+const bodyProgressRoutes = require('./routes/bodyProgress');
+const announcementRoutes = require('./routes/announcement');
 
 dotenv.config();
 
@@ -20,6 +23,9 @@ connectDB();
 app.use('/api/auth', authRoutes);
 app.use('/api/gym', gymRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/macro', macroRoutes);
+app.use('/api/body-progress', bodyProgressRoutes);
+app.use('/api/announcement', announcementRoutes);
 
 app.get('/', (req, res) => {
   res.send('BeFit Backend is running');
