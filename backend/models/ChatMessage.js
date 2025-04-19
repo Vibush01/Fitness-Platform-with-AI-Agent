@@ -8,18 +8,20 @@ const chatMessageSchema = new mongoose.Schema({
   },
   senderRole: {
     type: String,
-    enum: ['gym', 'trainer', 'member'],
+    enum: ['gym', 'trainer', 'member', 'ai'],
     required: true,
   },
   recipient: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
   },
   recipientRole: {
     type: String,
-    enum: ['gym', 'trainer', 'member'],
-    required: true,
+    enum: ['gym', 'trainer', 'member', 'ai'],
+  },
+  isAI: {
+    type: Boolean,
+    default: false,
   },
   message: {
     type: String,
