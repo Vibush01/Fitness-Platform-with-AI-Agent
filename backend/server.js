@@ -12,6 +12,7 @@ const chatRoutes = require('./routes/chat');
 const aiAgentRoutes = require('./routes/aiAgent');
 const planRequestRoutes = require('./routes/planRequest');
 const profileRoutes = require('./routes/profile');
+const contactRoutes = require('./routes/contact');
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/ai-agent', aiAgentRoutes);
 app.use('/api/plan-request', planRequestRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/contact', contactRoutes);
 
 app.get('/', (req, res) => {
   res.send('BeFit Backend is running');

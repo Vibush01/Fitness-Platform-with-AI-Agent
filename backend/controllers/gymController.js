@@ -2,6 +2,7 @@ const Gym = require('../models/Gym');
 const User = require('../models/User');
 const Trainer = require('../models/Trainer');
 const Member = require('../models/Member');
+const Membership = require('../models/Membership');
 
 const updateGymProfile = async (req, res) => {
   const { name, address, photos, ownerName } = req.body;
@@ -44,7 +45,7 @@ const getJoinRequests = async (req, res) => {
 };
 
 const acceptJoinRequest = async (req, res) => {
-  const { userType, userId } = req.body; // userType: 'trainer' or 'member'
+  const { userType, userId, membershipTimeline } = req.body; // Added membershipTimeline
   const gymUserId = req.user.id;
 
   try {
@@ -74,6 +75,38 @@ const acceptJoinRequest = async (req, res) => {
       }
       member.gym = gymUser.profile._id;
       await member.save();
+
+      // Create a membership entry
+      const startDate = new Date();
+      let expiryDate = new Date(startDate);
+      const timeline = membershipTimeline || '1 month'; // Default to 1 month if not specified
+      switch (timeline) {
+        case '1 week':
+          expiryDate.setDate(startDate.getDate() + 7);
+          break;
+        case '1 month':
+          expiryDate.setMonth(startDate.getMonth() + 1);
+          break;
+        case '3 months':
+          expiryDate.setMonth(startDate.getMonth() + 3);
+          break;
+        case '6 months':
+          expiryDate.setMonth(startDate.getMonth() + 6);
+          break;
+        case '1 year':
+          expiryDate.setFullYear(startDate.getFullYear() + 1);
+          break;
+        default:
+          expiryDate.setMonth(startDate.getMonth() + 1); // Default to 1 month
+      }
+
+      await Membership.create({
+        member: member._id,
+        gym: gymUser.profile._id,
+        startDate,
+        expiryDate,
+      });
+
       res.status(200).json({ message: 'Member added to gym' });
     } else {
       res.status(400).json({ message: 'Invalid user type' });
@@ -83,4 +116,37 @@ const acceptJoinRequest = async (req, res) => {
   }
 };
 
-module.exports = { updateGymProfile, getJoinRequests, acceptJoinRequest };
+const getMembers = async (req, res) => {
+  const { gymId } = req.params;
+
+  try {
+    const members = await Member.find({ gym: gymId });
+    res.status(200).json(members);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getTrainers = async (req, res) => {
+  const { gymId } = req.params;
+
+  try {
+    const trainers = await Trainer.find({ gym: gymId });
+    res.status(200).json(trainers);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getMemberships = async (req, res) => {
+  const { gymId } = req.params;
+
+  try {
+    const memberships = await Membership.find({ gym: gymId }).populate('member');
+    res.status(200).json(memberships);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { updateGymProfile, getJoinRequests, acceptJoinRequest, getMembers, getTrainers, getMemberships };

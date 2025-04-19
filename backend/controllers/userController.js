@@ -27,7 +27,7 @@ const getGymDetails = async (req, res) => {
 };
 
 const joinGymRequest = async (req, res) => {
-  const { gymId, membershipTimeline } = req.body; // membershipTimeline for members only
+  const { gymId, membershipTimeline } = req.body;
   const userId = req.user.id;
 
   try {
@@ -46,14 +46,12 @@ const joinGymRequest = async (req, res) => {
       if (trainer.gym) {
         return res.status(400).json({ message: 'Trainer already belongs to a gym' });
       }
-      // Join request is handled by the gym accepting it (no additional action needed here)
       res.status(200).json({ message: 'Join request sent to gym' });
     } else if (user.role === 'member') {
       const member = await Member.findById(user.profile._id);
       if (member.gym) {
         return res.status(400).json({ message: 'Member already belongs to a gym' });
       }
-      // Join request is handled by the gym accepting it (membershipTimeline can be stored in future)
       res.status(200).json({ message: 'Join request sent to gym', membershipTimeline });
     } else {
       res.status(400).json({ message: 'Invalid role' });
@@ -63,4 +61,13 @@ const joinGymRequest = async (req, res) => {
   }
 };
 
-module.exports = { getGyms, getGymDetails, joinGymRequest };
+const getUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { getGyms, getGymDetails, joinGymRequest, getUsers };
